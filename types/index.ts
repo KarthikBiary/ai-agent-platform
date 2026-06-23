@@ -26,11 +26,21 @@ export type Voice =
 
 export type AgentStatus = "active" | "draft" | "paused";
 
+export type LeadSource =
+  | "website"
+  | "phone"
+  | "whatsapp"
+  | "referral"
+  | "google_ads"
+  | "facebook_ads"
+  | "manual";
+
 export type LeadStatus =
   | "new"
   | "contacted"
   | "qualified"
-  | "booked"
+  | "proposal_sent"
+  | "won"
   | "lost";
 
 export type KnowledgeSourceType = "pdf" | "docx" | "url";
@@ -68,9 +78,20 @@ export interface Lead {
   phone: string;
   email: string;
   status: LeadStatus;
-  score: number; // 0–100
+  score: number; // 0–100 (read-only, display only)
+  leadSource: LeadSource;
   agentId: string;
   createdAt: string; // ISO 8601
+}
+
+/** Form data for creating/editing a lead (excludes server-generated fields and read-only score). */
+export interface LeadFormData {
+  name: string;
+  phone: string;
+  email: string;
+  status: LeadStatus;
+  leadSource: LeadSource;
+  agentId: string;
 }
 
 /** `knowledge_sources` table. */
@@ -94,16 +115,32 @@ export interface KnowledgeSourceFormData {
   status: "processing" | "ready";
 }
 
+export type CallDirection = "inbound" | "outbound";
+
+export type CallStatus = "queued" | "ringing" | "completed" | "missed" | "failed";
+
+export type CallOutcome =
+  | "interested"
+  | "follow_up"
+  | "not_interested"
+  | "booked_meeting"
+  | "voicemail"
+  | "unknown";
+
 /** `calls` table. */
 export interface Call {
   id: string;
   agentId: string;
   leadId: string;
   durationSec: number;
+  direction: CallDirection;
+  status: CallStatus;
+  outcome: CallOutcome;
   recordingUrl: string | null;
   transcript: string | null;
   summary: string | null;
-  createdAt: string; // ISO 8601
+  startedAt: string; // ISO 8601
+  endedAt: string;   // ISO 8601
 }
 
 /* --------------------------- Dashboard primitives ------------------------- */

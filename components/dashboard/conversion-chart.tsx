@@ -16,20 +16,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useChartColors } from "@/lib/use-chart-colors";
 
 interface ConversionChartProps {
-  /** Weekly conversion data (week label, rate as percentage). */
   data: { week: string; rate: number }[];
 }
 
-/**
- * Bar chart showing weekly conversion rate (%).
- * Client Component because Recharts uses React state for SVG rendering.
- */
 export function ConversionChart({ data }: ConversionChartProps) {
-  const colors = useChartColors();
-
   return (
     <Card>
       <CardHeader>
@@ -62,7 +54,7 @@ export function ConversionChart({ data }: ConversionChartProps) {
               }}
               formatter={(value) => [`${value}%`, "Conversion"]}
             />
-            <Bar dataKey="rate" fill={colors[2]} radius={[4, 4, 0, 0]} name="Conversion" />
+            <Bar dataKey="rate" fill="var(--chart-3)" radius={[4, 4, 0, 0]} name="Conversion" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

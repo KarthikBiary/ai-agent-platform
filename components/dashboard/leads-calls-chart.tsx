@@ -16,24 +16,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useChartColors } from "@/lib/use-chart-colors";
 import type { SeriesPoint } from "@/types";
 
 interface LeadsCallsChartProps {
-  /** 30-day leads series (date, value). */
   leads: SeriesPoint[];
-  /** 30-day calls series (date, value). */
   calls: SeriesPoint[];
 }
 
-/**
- * Dual-area chart showing leads & calls over time.
- * Client Component because Recharts uses React state for SVG rendering.
- */
 export function LeadsCallsChart({ leads, calls }: LeadsCallsChartProps) {
-  const colors = useChartColors();
-
-  // Merge the two series into a single array keyed by date.
   const merged = leads.map((l) => {
     const c = calls.find((c) => c.date === l.date);
     return { date: l.date, leads: l.value, calls: c?.value ?? 0 };
@@ -56,7 +46,6 @@ export function LeadsCallsChart({ leads, calls }: LeadsCallsChartProps) {
               tickMargin={8}
               className="text-muted-foreground"
               tickFormatter={(v: string) => {
-                // "Jun 23" instead of full ISO
                 const d = new Date(v + "T00:00:00");
                 return d.toLocaleDateString("en-US", {
                   month: "short",
@@ -83,8 +72,8 @@ export function LeadsCallsChart({ leads, calls }: LeadsCallsChartProps) {
               type="monotone"
               dataKey="leads"
               stackId="a"
-              stroke={colors[0]}
-              fill={colors[0]}
+              stroke="var(--chart-1)"
+              fill="var(--chart-1)"
               fillOpacity={0.2}
               name="Leads"
             />
@@ -92,8 +81,8 @@ export function LeadsCallsChart({ leads, calls }: LeadsCallsChartProps) {
               type="monotone"
               dataKey="calls"
               stackId="a"
-              stroke={colors[1]}
-              fill={colors[1]}
+              stroke="var(--chart-2)"
+              fill="var(--chart-2)"
               fillOpacity={0.2}
               name="Calls"
             />
