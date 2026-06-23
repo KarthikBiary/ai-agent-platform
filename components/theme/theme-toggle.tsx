@@ -1,0 +1,50 @@
+"use client";
+
+import { useTheme } from "next-themes";
+import { MoonIcon, SunIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+/**
+ * Light / Dark / System theme switcher.
+ *
+ * The icon is toggled purely with CSS (`dark:` variants) rather than reading
+ * the resolved theme in JS. This avoids a `setState`-in-effect mount guard
+ * (flagged by react-hooks/set-state-in-effect) and a hydration mismatch: the
+ * server and first client paint render the same markup, and the `.dark` class
+ * on <html> drives the correct icon.
+ */
+export function ThemeToggle() {
+  const { setTheme } = useTheme();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label="Toggle theme">
+          <SunIcon className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+          <MoonIcon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          <SunIcon className="size-4" />
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          <MoonIcon className="size-4" />
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          <MoonIcon className="size-4" />
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
