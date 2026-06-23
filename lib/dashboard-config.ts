@@ -4,10 +4,6 @@ import {
   BookOpen,
   Users,
   PhoneCall,
-  CalendarCheck,
-  DollarSign,
-  Star,
-  UtensilsCrossed,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------------------

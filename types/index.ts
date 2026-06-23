@@ -35,7 +35,7 @@ export type LeadStatus =
 
 export type KnowledgeSourceType = "pdf" | "docx" | "url";
 
-export type KnowledgeSourceStatus = "ready" | "processing" | "failed";
+export type KnowledgeSourceStatus = "ready" | "processing";
 
 export type ActivityType = "lead" | "call" | "upload";
 
@@ -77,10 +77,21 @@ export interface Lead {
 export interface KnowledgeSource {
   id: string;
   agentId: string;
+  name: string;
   fileName: string;
   sourceType: KnowledgeSourceType;
   status: KnowledgeSourceStatus;
   createdAt: string; // ISO 8601
+}
+
+/** Form data for creating/editing a knowledge source (excludes server-generated fields). */
+export interface KnowledgeSourceFormData {
+  name: string;
+  sourceType: KnowledgeSourceType;
+  agentId: string;
+  url?: string;
+  file?: File;
+  status: "processing" | "ready";
 }
 
 /** `calls` table. */

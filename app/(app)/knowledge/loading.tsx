@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-export default function AgentsLoading() {
+export default function KnowledgeLoading() {
   return (
     <div className="space-y-6 animate-pulse">
       <div className="flex items-center justify-between">

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Input } from "@/components/ui/input";
@@ -95,7 +95,7 @@ export function AgentForm({
       <div className="space-y-2">
         <Label htmlFor="industry">Industry</Label>
         <Select
-          value={form.watch("industry")}
+          value={useWatch({ control: form.control, name: "industry" })}
           onValueChange={(value: Industry) => form.setValue("industry", value)}
           disabled={isLoading}
         >
@@ -129,7 +129,7 @@ export function AgentForm({
           <p className="text-sm text-destructive" role="alert">{form.formState.errors.prompt.message}</p>
         )}
         <p className="text-xs text-muted-foreground">
-          {form.watch("prompt")?.length ?? 0} / 5000 characters
+          {useWatch({ control: form.control, name: "prompt" })?.length ?? 0} / 5000 characters
         </p>
       </div>
 
@@ -137,7 +137,7 @@ export function AgentForm({
         <div className="space-y-2">
           <Label htmlFor="voice">Voice</Label>
           <Select
-            value={form.watch("voice")}
+            value={useWatch({ control: form.control, name: "voice" })}
             onValueChange={(value: Voice) => form.setValue("voice", value)}
             disabled={isLoading}
           >
@@ -157,7 +157,7 @@ export function AgentForm({
         <div className="space-y-2">
           <Label htmlFor="status">Status</Label>
           <Select
-            value={form.watch("status")}
+            value={useWatch({ control: form.control, name: "status" })}
             onValueChange={(value: AgentStatus) => form.setValue("status", value)}
             disabled={isLoading}
           >

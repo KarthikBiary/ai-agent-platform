@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Search, Filter, X, ChevronDown } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -16,47 +15,46 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import type { Industry, AgentStatus } from "@/types";
+import type { Agent, KnowledgeSourceType } from "@/types";
 
-const INDUSTRIES: { value: Industry; label: string }[] = [
-  { value: "healthcare", label: "Healthcare" },
-  { value: "real_estate", label: "Real Estate" },
-  { value: "restaurant", label: "Restaurant" },
-  { value: "spa", label: "Spa" },
-  { value: "convention_hall", label: "Convention Hall" },
-  { value: "hospitality", label: "Hospitality" },
+const SOURCE_TYPES: { value: KnowledgeSourceType; label: string }[] = [
+  { value: "pdf", label: "PDF" },
+  { value: "docx", label: "DOCX" },
+  { value: "url", label: "Website URL" },
 ];
 
-const STATUSES: { value: AgentStatus; label: string }[] = [
-  { value: "active", label: "Active" },
-  { value: "draft", label: "Draft" },
-  { value: "paused", label: "Paused" },
-];
-
-interface AgentsFiltersProps {
+interface KnowledgeFiltersProps {
+  agents: Agent[];
   initialSearch: string;
-  initialIndustries: Industry[];
-  initialStatuses: AgentStatus[];
-  initialSortBy: "name" | "industry" | "createdAt";
+  initialAgentId: string;
+  initialSourceType: KnowledgeSourceType | "";
+  initialSortBy: "name" | "sourceType" | "createdAt";
   initialSortOrder: "asc" | "desc";
+  onSearchChange: (value: string) => void;
+  onAgentIdChange: (value: string) => void;
+  onSourceTypeChange: (value: KnowledgeSourceType | "") => void;
+  onSortChange: (sortBy: "name" | "sourceType" | "createdAt", sortOrder: "asc" | "desc") => void;
 }
 
-export function AgentsFilters({
+export function KnowledgeFilters({
+  agents,
   initialSearch,
-  initialIndustries,
-  initialStatuses,
+  initialAgentId,
+  initialSourceType,
   initialSortBy,
   initialSortOrder,
-}: AgentsFiltersProps) {
-  const router = useRouter();
-
+  onSearchChange,
+  onAgentIdChange,
+  onSourceTypeChange,
+  onSortChange,
+}: KnowledgeFiltersProps) {
   const [search, setSearch] = React.useState(initialSearch);
-  const [industries, setIndustries] = React.useState<Industry[]>(initialIndustries);
-  const [statuses, setStatuses] = React.useState<AgentStatus[]>(initialStatuses);
-  const [sortBy, setSortBy] = React.useState<"name" | "industry" | "createdAt">(initialSortBy);
+  const [agentId, setAgentId] = React.useState(initialAgentId);
+  const [sourceType, setSourceType] = React.useState<KnowledgeSourceType | "">(initialSourceType);
+  const [sortBy, setSortBy] = React.useState<"name" | "sourceType" | "createdAt">(initialSortBy);
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">(initialSortOrder);
-  const [industryOpen, setIndustryOpen] = React.useState(false);
-  const [statusOpen, setStatusOpen] = React.useState(false);
+  const [agentOpen, setAgentOpen] = React.useState(false);
+  const [typeOpen, setTypeOpen] = React.useState(false);
 
   const debounceTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -64,39 +62,32 @@ export function AgentsFilters({
     if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
 
     debounceTimeoutRef.current = setTimeout(() => {
-      const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (industries.length > 0) params.set("industries", industries.join(","));
-      if (statuses.length > 0) params.set("statuses", statuses.join(","));
-      if (sortBy !== "createdAt") params.set("sortBy", sortBy);
-      if (sortOrder !== "desc") params.set("sortOrder", sortOrder);
-      router.push(`/agents?${params.toString()}`, { scroll: false });
+      onSearchChange(search);
+      onAgentIdChange(agentId);
+      onSourceTypeChange(sourceType);
+      onSortChange(sortBy, sortOrder);
     }, 300);
 
     return () => {
       if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
     };
-  }, [search, industries, statuses, sortBy, sortOrder, router]);
+  }, [search, agentId, sourceType, sortBy, sortOrder, onSearchChange, onAgentIdChange, onSourceTypeChange, onSortChange]);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
   };
 
-  const handleIndustryToggle = (industry: Industry) => {
-    const newIndustries = industries.includes(industry)
-      ? industries.filter((i) => i !== industry)
-      : [...industries, industry];
-    setIndustries(newIndustries);
+  const handleAgentToggle = (agentIdVal: string) => {
+    const newAgentId = agentId === agentIdVal ? "" : agentIdVal;
+    setAgentId(newAgentId);
   };
 
-  const handleStatusToggle = (status: AgentStatus) => {
-    const newStatuses = statuses.includes(status)
-      ? statuses.filter((s) => s !== status)
-      : [...statuses, status];
-    setStatuses(newStatuses);
+  const handleTypeToggle = (type: KnowledgeSourceType) => {
+    const newType = sourceType === type ? "" : type;
+    setSourceType(newType);
   };
 
-  const handleSortChange = (newSortBy: "name" | "industry" | "createdAt") => {
+  const handleSortChange = (newSortBy: "name" | "sourceType" | "createdAt") => {
     let newSortOrder: "asc" | "desc" = "asc";
     if (sortBy === newSortBy && sortOrder === "asc") {
       newSortOrder = "desc";
@@ -107,14 +98,14 @@ export function AgentsFilters({
 
   const clearAllFilters = () => {
     setSearch("");
-    setIndustries([]);
-    setStatuses([]);
+    setAgentId("");
+    setSourceType("");
     setSortBy("createdAt");
     setSortOrder("desc");
-    router.push("/agents", { scroll: false });
   };
 
-  const hasActiveFilters = search || industries.length > 0 || statuses.length > 0 || sortBy !== "createdAt" || sortOrder !== "desc";
+  const selectedAgent = agents.find((a) => a.id === agentId);
+  const hasActiveFilters = search || agentId || sourceType || sortBy !== "createdAt" || sortOrder !== "desc";
 
   return (
     <div className="flex flex-col sm:flex-row gap-4">
@@ -122,7 +113,7 @@ export function AgentsFilters({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search agents..."
+          placeholder="Search knowledge sources..."
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           className="pl-10"
@@ -130,60 +121,65 @@ export function AgentsFilters({
       </div>
 
       <div className="flex items-center gap-2">
-        <DropdownMenu open={industryOpen} onOpenChange={setIndustryOpen}>
+        <DropdownMenu open={agentOpen} onOpenChange={setAgentOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
               <Filter className="size-4" />
-              Industry
+              Agent
               <ChevronDown className="size-4" />
-              {industries.length > 0 && (
+              {agentId && (
                 <Badge variant="secondary" className="ml-1">
-                  {industries.length}
+                  {selectedAgent?.name ?? "1"}
                 </Badge>
               )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" side="bottom" align="end">
-            <DropdownMenuLabel>Filter by Industry</DropdownMenuLabel>
+            <DropdownMenuLabel>Filter by Agent</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              {INDUSTRIES.map((industry) => (
+              {agents.length === 0 && (
+                <DropdownMenuCheckboxItem disabled>
+                  No agents available
+                </DropdownMenuCheckboxItem>
+              )}
+              {agents.map((agent) => (
                 <DropdownMenuCheckboxItem
-                  key={industry.value}
-                  checked={industries.includes(industry.value)}
-                  onCheckedChange={() => handleIndustryToggle(industry.value)}
+                  key={agent.id}
+                  checked={agentId === agent.id}
+                  onCheckedChange={() => handleAgentToggle(agent.id)}
                 >
-                  {industry.label}
+                  {agent.name}
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <DropdownMenu open={statusOpen} onOpenChange={setStatusOpen}>
+        <DropdownMenu open={typeOpen} onOpenChange={setTypeOpen}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
               <Filter className="size-4" />
-              Status
+              Type
               <ChevronDown className="size-4" />
-              {statuses.length > 0 && (
+              {sourceType && (
                 <Badge variant="secondary" className="ml-1">
-                  {statuses.length}
+                  {sourceType.toUpperCase()}
                 </Badge>
               )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-48" side="bottom" align="end">
-            <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+            <DropdownMenuLabel>Filter by Type</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              {STATUSES.map((status) => (
+              {SOURCE_TYPES.map((type) => (
                 <DropdownMenuCheckboxItem
-                  key={status.value}
-                  checked={statuses.includes(status.value)}
-                  onCheckedChange={() => handleStatusToggle(status.value)}
+                  key={type.value}
+                  checked={sourceType === type.value}
+                  onCheckedChange={() => handleTypeToggle(type.value)}
                 >
-                  {status.label}
+                  {type.label}
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuGroup>
@@ -194,7 +190,7 @@ export function AgentsFilters({
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2">
               <ChevronDown className="size-4" />
-              Sort: {sortBy} ({sortOrder === "asc" ? "↑" : "↓"})
+              Sort: {sortBy} ({sortOrder === "asc" ? "\u2191" : "\u2193"})
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" side="bottom" align="end">
@@ -203,15 +199,15 @@ export function AgentsFilters({
             <DropdownMenuGroup>
               {[
                 { value: "name", label: "Name" },
-                { value: "industry", label: "Industry" },
+                { value: "sourceType", label: "Type" },
                 { value: "createdAt", label: "Created Date" },
               ].map((opt) => (
                 <DropdownMenuCheckboxItem
                   key={opt.value}
                   checked={sortBy === opt.value}
-                  onCheckedChange={() => handleSortChange(opt.value as "name" | "industry" | "createdAt")}
+                  onCheckedChange={() => handleSortChange(opt.value as "name" | "sourceType" | "createdAt")}
                 >
-                  {opt.label} {sortBy === opt.value && (sortOrder === "asc" ? "↑" : "↓")}
+                  {opt.label} {sortBy === opt.value && (sortOrder === "asc" ? "\u2191" : "\u2193")}
                 </DropdownMenuCheckboxItem>
               ))}
             </DropdownMenuGroup>

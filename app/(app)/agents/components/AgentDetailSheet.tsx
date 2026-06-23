@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X, Bot, Mic, FileText, BadgeCheck, Calendar } from "lucide-react";
+import { Bot, Mic, FileText, BadgeCheck, Calendar } from "lucide-react";
 
 import {
   Sheet,

@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Toaster } from "sonner";
 
 import { listAgents, createAgent, updateAgent, deleteAgent } from "@/lib/data/agents";
@@ -31,16 +30,15 @@ export function AgentsClient({
   initialSortOrder: "asc" | "desc";
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [agents, setAgents] = React.useState<Agent[]>(initialAgents);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const [search, setSearch] = React.useState(initialSearch);
-  const [industries, setIndustries] = React.useState<Industry[]>(initialIndustries);
-  const [statuses, setStatuses] = React.useState<AgentStatus[]>(initialStatuses);
-  const [sortBy, setSortBy] = React.useState<"name" | "industry" | "createdAt">(initialSortBy);
-  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">(initialSortOrder);
+  const [search] = React.useState(initialSearch);
+  const [industries] = React.useState<Industry[]>(initialIndustries);
+  const [statuses] = React.useState<AgentStatus[]>(initialStatuses);
+  const [sortBy] = React.useState<"name" | "industry" | "createdAt">(initialSortBy);
+  const [sortOrder] = React.useState<"asc" | "desc">(initialSortOrder);
 
   const [createDialogOpen, setCreateDialogOpen] = React.useState(false);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -67,7 +65,7 @@ export function AgentsClient({
       await createAgent(data);
       router.refresh();
       import("sonner").then(({ toast }) => toast.success("Agent created successfully"));
-    } catch (error) {
+    } catch {
       import("sonner").then(({ toast }) => toast.error("Failed to create agent"));
     } finally {
       setSubmitLoading(false);
@@ -81,7 +79,7 @@ export function AgentsClient({
       await updateAgent(editingAgent.id, data);
       router.refresh();
       import("sonner").then(({ toast }) => toast.success("Agent updated successfully"));
-    } catch (error) {
+    } catch {
       import("sonner").then(({ toast }) => toast.error("Failed to update agent"));
     } finally {
       setSubmitLoading(false);
@@ -95,7 +93,7 @@ export function AgentsClient({
       await deleteAgent(deletingAgent.id);
       router.refresh();
       import("sonner").then(({ toast }) => toast.success("Agent deleted successfully"));
-    } catch (error) {
+    } catch {
       import("sonner").then(({ toast }) => toast.error("Failed to delete agent"));
     } finally {
       setSubmitLoading(false);

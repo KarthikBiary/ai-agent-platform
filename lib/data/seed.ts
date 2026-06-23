@@ -144,6 +144,7 @@ export const knowledgeSources: KnowledgeSource[] = [
   {
     id: "ks_1",
     agentId: "agt_1",
+    name: "Clinic Services Brochure",
     fileName: "clinic-services-brochure.pdf",
     sourceType: "pdf",
     status: "ready",
@@ -152,6 +153,7 @@ export const knowledgeSources: KnowledgeSource[] = [
   {
     id: "ks_2",
     agentId: "agt_1",
+    name: "Smile Dental FAQ",
     fileName: "https://docs.smiledental.example.com/faq",
     sourceType: "url",
     status: "ready",
@@ -160,6 +162,7 @@ export const knowledgeSources: KnowledgeSource[] = [
   {
     id: "ks_3",
     agentId: "agt_2",
+    name: "Neighborhood Listings",
     fileName: "neighborhood-listings.docx",
     sourceType: "docx",
     status: "processing",
